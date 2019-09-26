@@ -125,6 +125,14 @@ AM_COND_IF([ENABLE_PAYLOADCHECK], [
 	AC_DEFINE([ENABLE_PAYLOADCHECK], [1], [Define to 1 if PAYLOADCHECK is enabled.])
 ])
 
+AC_ARG_ENABLE([spa],
+	[AS_HELP_STRING([--enable-spa], [build SPA plugin])])
+AM_CONDITIONAL([ENABLE_SPA], [test "x$enable_spa" = "xyes"])
+AM_COND_IF([ENABLE_SPA], [
+	PKG_CHECK_MODULES([SPA], [libspa-0.1])
+	AC_DEFINE([ENABLE_SPA], [1], [Define to 1 if SPA is enabled.])
+])
+
 AC_ARG_ENABLE([aplay],
 	[AS_HELP_STRING([--disable-aplay], [disable building of bluealsa-aplay tool])])
 AM_CONDITIONAL([ENABLE_APLAY], [test "x$enable_aplay" != "xno"])
@@ -162,6 +170,10 @@ AC_ARG_WITH([alsaconfdir],
 	[AM_COND_IF([ALSA_1_1_7],
 		[alsaconfdir="$sysconfdir/alsa/conf.d"],
 		[alsaconfdir="$datadir/alsa/alsa.conf.d"])])
+AC_ARG_WITH([spaplugindir],
+	AS_HELP_STRING([--with-spaplugindir=dir], [path where SPA plugin files are stored]),
+	[spaplugindir="$withval"],
+	[spaplugindir=$($PKG_CONFIG --variable=libdir libspa-0.1)/spa])
 
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 test "x$exec_prefix" = xNONE && exec_prefix=$prefix
@@ -172,18 +184,23 @@ eval alsaconfdir="$alsaconfdir"
 eval alsaconfdir="$alsaconfdir"
 eval alsaplugindir="$alsaplugindir"
 eval alsaplugindir="$alsaplugindir"
+eval spaplugindir="$spaplugindir"
+eval spaplugindir="$spaplugindir"
 
 AC_DEFINE_UNQUOTED([ALSA_CONF_DIR], "$alsaconfdir", [Directory containing ALSA add-on configuration files.])
 AC_DEFINE_UNQUOTED([ALSA_PLUGIN_DIR], "$alsaplugindir", [Directory containing ALSA add-on modules.])
+AC_DEFINE_UNQUOTED([SPA_PLUGIN_DIR], "$spaplugindir", [Directory containing SPA add-on modules.])
 
 AC_SUBST([DBUS_CONF_DIR], [$dbusconfdir])
 AC_SUBST([ALSA_CONF_DIR], [$alsaconfdir])
 AC_SUBST([ALSA_PLUGIN_DIR], [$alsaplugindir])
+AC_SUBST([SPA_PLUGIN_DIR], [$spaplugindir])
 
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 	src/asound/Makefile
+	src/spa/Makefile
 	utils/Makefile
 	test/Makefile])
 AC_OUTPUT

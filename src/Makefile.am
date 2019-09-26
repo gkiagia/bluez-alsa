@@ -4,6 +4,10 @@
 bin_PROGRAMS = bluealsa
 SUBDIRS = asound
 
+if ENABLE_SPA
+SUBDIRS += spa
+endif
+
 dbusconfdir = @DBUS_CONF_DIR@
 dist_dbusconf_DATA = bluealsa.conf
 
